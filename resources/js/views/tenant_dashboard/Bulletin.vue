@@ -77,11 +77,17 @@
         </div>
         <div>
             <h2>Upload PDF</h2>
-            <input type="file" @change="onFileChange" accept=".pdf" />
-            <button @click="uploadPdf" :disabled="!file">Upload</button>
+            <input
+                type="file"
+                @change="handlePdfChange"
+                accept=".pdf"
+                class="border-2"
+                style="padding: 10px; border-radius: 5px; margin: 10px"
+            />
+            <button @click="uploadPdf" class="btn btn-primary">Upload</button>
 
             <h3 class="mt-4">Uploaded PDFs</h3>
-            <table border="1" cellpadding="5">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -94,9 +100,20 @@
                         <td>{{ index + 1 }}</td>
                         <td>{{ pdf.name }}</td>
                         <td>
-                            <a :href="`/storage/${pdf.path}`" target="_blank"
+                            <a
+                                v-if="pdf.path"
+                                :href="`/storage/${pdf.path}`"
+                                target="_blank"
                                 >View/Download</a
                             >
+
+                            <span v-else class="text-muted">File missing</span>
+                            <button
+                                @click="deletePdf(pdf.id)"
+                                class="btn btn-sm btn-danger ms-2"
+                            >
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -190,14 +207,8 @@ export default {
         };
 
         const uploadPdf = async () => {
-            if (!pdfFile.value) return;
-
-            if (pdfFile.value.size > 10 * 1024 * 1024) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: "PDF size must be less than 10MB",
-                });
+            if (!pdfFile.value) {
+                Swal.fire("Error", "Please select a PDF", "error");
                 return;
             }
 
@@ -205,35 +216,63 @@ export default {
             formData.append("pdf", pdfFile.value);
 
             try {
-                await axios.post("/upload-pdf", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-                Swal.fire({
-                    icon: "success",
-                    title: "Success",
-                    text: "PDF uploaded successfully",
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                });
+                await axios.post(
+                    "http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/upload-pdf",
+                    formData,
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
+                Swal.fire("Success", "PDF uploaded successfully", "success");
                 pdfFile.value = null;
-                fetchPdfs();
+                fetchPdfs(); // refresh table
             } catch (err) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: err.response?.data?.message || "Failed to upload PDF",
-                });
+                Swal.fire(
+                    "Error",
+                    err.response?.data?.message || "Upload failed",
+                    "error"
+                );
             }
         };
 
         const fetchPdfs = async () => {
             try {
-                const res = await axios.get("/pdfs");
+                const res = await axios.get(
+                    "http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/pdfs"
+                );
                 pdfs.value = res.data;
             } catch (err) {
-                console.error("Failed to fetch PDFs", err);
+                console.error(err);
+            }
+        };
+
+        const deletePdf = async (id) => {
+            const confirmed = await Swal.fire({
+                title: "Are you sure?",
+                text: "This will delete the PDF permanently!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+            });
+
+            if (confirmed.isConfirmed) {
+                try {
+                    await axios.delete(
+                        `http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/pdfs/${id}`
+                    );
+                    Swal.fire(
+                        "Deleted!",
+                        "PDF deleted successfully.",
+                        "success"
+                    );
+                    fetchPdfs(); // refresh table
+                } catch (err) {
+                    Swal.fire(
+                        "Error",
+                        err.response?.data?.message || "Delete failed",
+                        "error"
+                    );
+                }
             }
         };
 
@@ -319,6 +358,7 @@ export default {
             handlePdfChange,
             uploadPdf,
             saveSettings,
+            deletePdf,
         };
     },
 };

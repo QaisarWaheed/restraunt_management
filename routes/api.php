@@ -1,28 +1,30 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\API\AuthController;
+use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use App\Http\Controllers\API\Tenant\TenantController as RestaurantTenantController;
-use App\Http\Controllers\API\Dashboard\UserController as DashboardUserController;
-use App\Http\Controllers\API\Dashboard\TenantController as DashboardTenantController;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RegisterController;
-use App\Http\Controllers\API\Dashboard\RoleController as DashboardRoleController;
-use App\Http\Controllers\API\Tenant\RoleController as TenantRoleController;
-use App\Http\Controllers\API\Tenant\UserController as TenantUserController;
-use App\Http\Controllers\API\Tenant\CategoryController as TenantCategoryController;
-use App\Http\Controllers\API\Tenant\ProductController as TenantProductController;
-use App\Http\Controllers\API\Tenant\OrderController as TenantOrderController;
-use App\Http\Controllers\API\Tenant\StockCheckController as TenantStockCheckController;
-use App\Http\Controllers\API\Tenant\CustomerController as TenantCustomerController;
 use App\Http\Controllers\API\Dashboard\DashboardController;
-use App\Http\Controllers\API\Tenant\TenantDashboardController;
+use App\Http\Controllers\API\Dashboard\RoleController as DashboardRoleController;
+use App\Http\Controllers\API\Dashboard\TenantController as DashboardTenantController;
+use App\Http\Controllers\API\Dashboard\UserController as DashboardUserController;
 use App\Http\Controllers\API\Tenant\AuthController as TenantAuthController;
 use App\Http\Controllers\API\Tenant\BookingController as TenantBookingController;
+use App\Http\Controllers\API\Tenant\CategoryController as TenantCategoryController;
 use App\Http\Controllers\API\Tenant\CmsMenuController;
+use App\Http\Controllers\API\Tenant\CustomerController as TenantCustomerController;
+use App\Http\Controllers\API\Tenant\OrderController as TenantOrderController;
+use App\Http\Controllers\API\Tenant\ProductController as TenantProductController;
+use App\Http\Controllers\API\Tenant\RoleController as TenantRoleController;
+use App\Http\Controllers\API\Tenant\StockCheckController as TenantStockCheckController;
+use App\Http\Controllers\API\Tenant\TenantController as RestaurantTenantController;
+use App\Http\Controllers\API\Tenant\TenantDashboardController;
+use App\Http\Controllers\API\Tenant\TenantPdfUpload;
+use App\Http\Controllers\API\Tenant\UserController as TenantUserController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -99,6 +101,9 @@ Route::middleware([
         // Settings Routes
         Route::put('/settings', [App\Http\Controllers\API\Tenant\SettingController::class, 'update']);
         Route::put('/settings/discount', [App\Http\Controllers\API\Tenant\SettingController::class, 'updateDiscount']);
+   Route::post('/upload-pdf', [TenantPdfUpload::class, 'upload']);
+Route::get('/pdfs', [TenantPdfUpload::class, 'list']);
+Route::delete('/pdfs/{id}', [TenantPdfUpload::class, 'delete']);
         Route::put('/email-setting', [App\Http\Controllers\API\Tenant\SettingController::class, 'save_email_setting']);
         Route::post('/upload-logo', [App\Http\Controllers\API\Tenant\SettingController::class, 'uploadLogo']);
 
