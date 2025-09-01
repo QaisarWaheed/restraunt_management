@@ -8,25 +8,26 @@ use App\Http\Controllers\Controller;
 class TenantPdfUpload extends Controller
 {
     public function upload(Request $request)
-{
-    $request->validate([
-        'pdf' => 'required|mimes:pdf|max:10240', 
-    ]);
+    {
+        $request->validate([
+            'pdf' => 'required|mimes:pdf|max:10240',
+        ]);
 
-    $file = $request->file('pdf');
+        $file = $request->file('pdf');
+        $path = $file->store('pdfs', 'public');
 
-    $path = $file->store('pdfs', 'public'); 
+        $pdf = TenantPdf::create([
+            'name' => $file->getClientOriginalName(),
+            'path' => $path,
+        ]);
 
-    $pdf = TenantPdf::create([
-        'name' => $file->getClientOriginalName(),
-        'path' => $path,  
-    ]);
+        $pdf->url = asset('storage/' . $pdf->path);
 
-    return response()->json([
-        'message' => 'PDF uploaded successfully',
-        'pdf' => $pdf,
-    ]);
-}
+        return response()->json([
+            'message' => 'PDF uploaded successfully',
+            'pdf' => $pdf,
+        ]);
+    }
 
     public function list()
     {
@@ -35,18 +36,29 @@ class TenantPdfUpload extends Controller
     }
 
 
- public function delete($id)
-{
-    $pdf = TenantPdf::findOrFail($id);
 
-    if (\Storage::disk('public')->exists($pdf->path)) {
-        \Storage::disk('public')->delete($pdf->path);
+
+
+
+
+
+
+
+    public function delete($id)
+    {
+        $pdf = TenantPdf::findOrFail($id);
+
+        if (\Storage::disk('public')->exists($pdf->path)) {
+            \Storage::disk('public')->delete($pdf->path);
+        }
+
+        $pdf->delete();
+
+        return response()->json(['message' => 'PDF deleted successfully']);
     }
 
-    $pdf->delete();
 
-    return response()->json(['message' => 'PDF deleted successfully']);
-}
+
 
 
 

@@ -93,7 +93,7 @@ Route::middleware([
         Route::post('/cms_menu/{id}/restore', [CmsMenuController::class, 'restore']);
         Route::post('/cms_menu/upload-image', [CmsMenuController::class, 'uploadImage']);
 
-        // Booking Rooutes
+        // Booking Routes
         Route::get('/reservations-list', [TenantBookingController::class, 'showReservationInfo']);
         Route::get('/contacts-list', [TenantBookingController::class, 'showContactInfo']);
         Route::get('/subscribers-list', [TenantBookingController::class, 'showSubscriberEmail']);
@@ -101,9 +101,10 @@ Route::middleware([
         // Settings Routes
         Route::put('/settings', [App\Http\Controllers\API\Tenant\SettingController::class, 'update']);
         Route::put('/settings/discount', [App\Http\Controllers\API\Tenant\SettingController::class, 'updateDiscount']);
-   Route::post('/upload-pdf', [TenantPdfUpload::class, 'upload']);
-Route::get('/pdfs', [TenantPdfUpload::class, 'list']);
-Route::delete('/pdfs/{id}', [TenantPdfUpload::class, 'delete']);
+        Route::post('/upload-pdf', [TenantPdfUpload::class, 'upload']);
+        Route::get('/pdfs', [TenantPdfUpload::class, 'list']);
+        Route::delete('/pdfs/{id}', [TenantPdfUpload::class, 'delete']);
+
         Route::put('/email-setting', [App\Http\Controllers\API\Tenant\SettingController::class, 'save_email_setting']);
         Route::post('/upload-logo', [App\Http\Controllers\API\Tenant\SettingController::class, 'uploadLogo']);
 
@@ -152,14 +153,14 @@ Route::delete('/pdfs/{id}', [TenantPdfUpload::class, 'delete']);
         });
         Route::get('/auth-check', function () {
             $user = Auth::user();
-            Log::info("user is:".$user);
+            Log::info("user is:" . $user);
 
             $roles = $user->getRoleNames();
-            Log::info("roles are:".$roles);
+            Log::info("roles are:" . $roles);
             $roleName = $roles->first();
             $formattedRoleName = ucwords(str_replace('_', ' ', $roleName));
 
-            Log::info("Role Name is:".$roleName);
+            Log::info("Role Name is:" . $roleName);
             return response()->json([
                 'authenticated' => $user ? true : false,
                 'user' => $user,

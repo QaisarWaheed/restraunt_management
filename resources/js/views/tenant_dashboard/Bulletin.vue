@@ -216,16 +216,12 @@ export default {
             formData.append("pdf", pdfFile.value);
 
             try {
-                await axios.post(
-                    "http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/upload-pdf",
-                    formData,
-                    {
-                        headers: { "Content-Type": "multipart/form-data" },
-                    }
-                );
+                await axios.post("/tenant/upload-pdf", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
                 Swal.fire("Success", "PDF uploaded successfully", "success");
                 pdfFile.value = null;
-                fetchPdfs(); // refresh table
+                fetchPdfs();
             } catch (err) {
                 Swal.fire(
                     "Error",
@@ -237,9 +233,7 @@ export default {
 
         const fetchPdfs = async () => {
             try {
-                const res = await axios.get(
-                    "http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/pdfs"
-                );
+                const res = await axios.get("/tenant/pdfs");
                 pdfs.value = res.data;
             } catch (err) {
                 console.error(err);
@@ -257,15 +251,13 @@ export default {
 
             if (confirmed.isConfirmed) {
                 try {
-                    await axios.delete(
-                        `http://rayadefencerayagolfresortsectormdhaphase6lahorepakistan.localhost:8000/api/pdfs/${id}`
-                    );
+                    await axios.delete(`/tenant/pdfs/${id}`);
                     Swal.fire(
                         "Deleted!",
                         "PDF deleted successfully.",
                         "success"
                     );
-                    fetchPdfs(); // refresh table
+                    fetchPdfs();
                 } catch (err) {
                     Swal.fire(
                         "Error",
